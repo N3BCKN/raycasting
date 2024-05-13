@@ -18,7 +18,7 @@ class Player
   attr_accessor :x, :y, :forward
   attr_reader :player_angle
 
-  def initialize
+  def initialize(map)
     @x = HEIGH / 2
     @y = WIDTH / 4
     @player_angle = Math::PI
@@ -26,16 +26,7 @@ class Player
     @half_fow = @fow / 2
     @step_angle = @fow / RAYS_DENSITY 
     @forward = true
-    @map = [
-      [1,1,1,1,1,1,1,1],
-      [1,0,1,0,0,0,0,1],
-      [1,0,1,0,0,1,1,1],
-      [1,0,1,0,0,0,0,1],
-      [1,0,0,0,0,0,0,1],
-      [1,0,0,0,0,0,0,1],
-      [1,0,0,1,1,0,0,1],
-      [1,1,1,1,1,1,1,1]
-      ]
+    @map = map
   end 
 
   def draw
@@ -70,12 +61,9 @@ class Player
           target_x = @x - Math.sin(start_angle) * depth
           target_y = @y + Math.cos(start_angle) * depth
 
-          # covert target X, Y coordinate to map col, row
+          # convert target X, Y coordinates to map col, row
           col = (target_x / TILE_SIZE).to_i
           row = (target_y / TILE_SIZE).to_i
-
-          # calculate map square index
-          # square = row * MAP_SIZE + col
           
           # ray hits the condition
           if @map[row][col] == 1
@@ -102,6 +90,7 @@ class Player
             # fix stuck at the wall
             wall_height = HEIGH if wall_height > HEIGH
             
+            # draw a wall 
             Rectangle.new(x: HEIGH + ray * SCALE, 
             y: (HEIGH / 2) - wall_height / 2, 
             width: SCALE, 
@@ -133,15 +122,11 @@ def draw_map(map)
 end
 
 def draw_3d_background
-  # Rectangle.new(x: 480 , y: 0 , width: 480 , height: HEIGH / 2 , color: '#646464')
   Image.new('sky.jpg', x: 480 , y: 0 , width: 480 , height: HEIGH / 2)
-  # Image.new('lava.jpg', x: 480 , y: HEIGH / 2 , width: 480 , height: HEIGH / 2)
   Rectangle.new(x: 480 , y: HEIGH / 2 , width: 480 , height: HEIGH / 2, color: '#646464')
 end
 
-player = Player.new
-forward = true
-
+# 0 - empty  space, 1 - wall 
 map = [
   [1,1,1,1,1,1,1,1],
   [1,0,1,0,0,0,0,1],
@@ -152,6 +137,8 @@ map = [
   [1,0,0,1,1,0,0,1],
   [1,1,1,1,1,1,1,1]
   ]
+
+player = Player.new(map)
 
 update do
   clear
